@@ -121,14 +121,12 @@ function play() {
     snake.move();
 
     if(snake.head.x == food.x && snake.head.y == food.y) {
-        console.log("you eat!");
         food.eaten();
         snake.eat();
     };
 
     snake.tail.forEach(tail => {
         if(snake.head.x == tail.x && snake.head.y == tail.y){
-            console.log("you lose")
             restart();
         }
     });
