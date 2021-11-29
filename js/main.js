@@ -1,12 +1,13 @@
 const canvas = document.getElementById('gameField');
 const ctx = canvas.getContext('2d');
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
 var Config = {
     height: canvas.height,
     width: canvas.width,
     cellSize: 40,
     step: 0,
-    maxStep: 8,
+    maxStep: 7,
 }
 
 class Entity {
@@ -27,15 +28,17 @@ class Game {
             ctx.fillStyle = "#71C9CE";
             ctx.fillRect(element.x, element.y, Config.cellSize, Config.cellSize);
         });
-        
+
         // draw head
         ctx.fillStyle = "#A6E3E9";
         ctx.fillRect(snake.head.x, snake.head.y, Config.cellSize, Config.cellSize);
     };
 
     drawFood(food) {
-        ctx.fillStyle = "#71C9CE";
-        ctx.fillRect(food.x, food.y, Config.cellSize/2, Config.cellSize/2);
+        ctx.beginPath();
+        ctx.fillStyle = "#FF2E63";
+        ctx.arc(food.x + (Config.cellSize / 2), food.y + (Config.cellSize / 2), Config.cellSize / 4, 0, 2 * Math.PI);
+        ctx.fill();
     };
 }
     
@@ -47,40 +50,41 @@ class Snake extends Entity {
 
         this.dx = Config.cellSize;
         this.dy = 0;
-
-        console.log(this.head);
-
-        this.size = 3;
-
-        this.tail = [
-            {x: this.x - Config.cellSize, y: this.y},
-            {x: this.x - Config.cellSize * 2, y: this.y},
-        ];
+        
+        this.maxTails = 0;
+        
+        this.tail = [];
     };
     
     move(){
-        snake.head.x += snake.dx;
-        snake.head.y += snake.dy;
-        
-        if(snake.head.x >= Config.width) {
-            snake.head.x = 0;
+        this.tail.unshift( { x: snake.head.x, y: snake.head.y } );
+
+        this.head.x += this.dx;
+        this.head.y += this.dy;
+
+        if ( this.tail.length > this.maxTails ) {
+            snake.tail.pop();
         }
 
-        else if(snake.head.x < 0) {
-            snake.head.x = Config.width;
+        if(this.head.x >= Config.width) {
+            this.head.x = 0;
+        }
+
+        else if(this.head.x < 0) {
+            this.head.x = Config.width - Config.cellSize;
         };
 
-        if(snake.head.y >= Config.height) {
-            snake.head.y = 0;
+        if(this.head.y >= Config.height) {
+            this.head.y = 0;
         }
 
-        else if(snake.head.y < 0) {
-            snake.head.y = Config.height;
+        else if(this.head.y < 0) {
+            this.head.y = Config.height - Config.cellSize;
         };
     }
 
     eat(){
-        this.size++;
+        this.maxTails++;
     };
 }
 
@@ -88,18 +92,16 @@ class Food extends Entity {
     constructor(x, y) {
         super(x, y);
     };
-    
-    // random = () => Math.floor(Math.random()*11);
 
     eaten(x, y){
-        this.x = Math.floor(Math.random() * 11);
-        this.y = y;
+        this.x = randomInt(0, Config.width / Config.cellSize) * Config.cellSize;
+        this.y = randomInt(0, Config.height / Config.cellSize) * Config.cellSize;
     };
 }
     
-let snake = new Snake(Config.width/2, Config.height/2);
+let snake = new Snake(0, 0);
 
-let food = new Food(0, 0);
+let food = new Food(randomInt(0, Config.width / Config.cellSize) * Config.cellSize, randomInt(0, Config.height / Config.cellSize) * Config.cellSize);
 
 let game = new Game();
 
@@ -117,6 +119,25 @@ function play() {
     game.drawSnake(snake);
 
     snake.move();
+
+    if(snake.head.x == food.x && snake.head.y == food.y) {
+        console.log("you eat!");
+        food.eaten();
+        snake.eat();
+    };
+
+    snake.tail.forEach(tail => {
+        if(snake.head.x == tail.x && snake.head.y == tail.y){
+            console.log("you lose")
+            restart();
+        }
+    });
+}
+
+function restart() {
+    snake = new Snake(0, 0);
+
+    food = new Food(randomInt(0, Config.width / Config.cellSize) * Config.cellSize, randomInt(0, Config.height / Config.cellSize) * Config.cellSize);
 }
 
 document.addEventListener("keydown", function(e) {
