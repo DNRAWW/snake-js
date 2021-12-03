@@ -31,7 +31,7 @@ class Game {
 
         // draw head
         ctx.fillStyle = "#A6E3E9";
-        ctx.fillRect(snake.head.x, snake.head.y, Config.cellSize, Config.cellSize);
+        ctx.fillRect(snake.x, snake.y, Config.cellSize, Config.cellSize);
     };
 
     drawFood(food) {
@@ -46,40 +46,38 @@ class Snake extends Entity {
     constructor(x, y) {
         super(x, y);
 
-        this.head = {x: this.x, y: this.y};
-
         this.dx = Config.cellSize;
         this.dy = 0;
         
-        this.maxTails = 0;
+        this.maxTails = 2;
         
         this.tail = [];
     };
     
     move(){
-        this.tail.unshift( { x: snake.head.x, y: snake.head.y } );
+        this.tail.unshift( { x: snake.x, y: snake.y } );
 
-        this.head.x += this.dx;
-        this.head.y += this.dy;
+        this.x += this.dx;
+        this.y += this.dy;
 
         if ( this.tail.length > this.maxTails ) {
             snake.tail.pop();
         }
 
-        if(this.head.x >= Config.width) {
-            this.head.x = 0;
+        if(this.x >= Config.width) {
+            this.x = 0;
         }
 
-        else if(this.head.x < 0) {
-            this.head.x = Config.width - Config.cellSize;
+        else if(this.x < 0) {
+            this.x = Config.width - Config.cellSize;
         };
 
-        if(this.head.y >= Config.height) {
-            this.head.y = 0;
+        if(this.y >= Config.height) {
+            this.y = 0;
         }
 
-        else if(this.head.y < 0) {
-            this.head.y = Config.height - Config.cellSize;
+        else if(this.y < 0) {
+            this.y = Config.height - Config.cellSize;
         };
     }
 
@@ -120,13 +118,13 @@ function play() {
 
     snake.move();
 
-    if(snake.head.x == food.x && snake.head.y == food.y) {
+    if(snake.x == food.x && snake.y == food.y) {
         food.eaten();
         snake.eat();
     };
 
     snake.tail.forEach(tail => {
-        if(snake.head.x == tail.x && snake.head.y == tail.y){
+        if(snake.x == tail.x && snake.y == tail.y){
             restart();
         }
     });
