@@ -91,7 +91,7 @@ class Food extends Entity {
         super(x, y);
     };
 
-    eaten(x, y){
+    eaten(){
         this.x = randomInt(0, Config.width / Config.cellSize) * Config.cellSize;
         this.y = randomInt(0, Config.height / Config.cellSize) * Config.cellSize;
     };
@@ -102,6 +102,14 @@ let snake = new Snake(0, 0);
 let food = new Food(randomInt(0, Config.width / Config.cellSize) * Config.cellSize, randomInt(0, Config.height / Config.cellSize) * Config.cellSize);
 
 let game = new Game();
+
+function restart() {
+    snake = new Snake(0, 0);
+
+    food = new Food(randomInt(0, Config.width / Config.cellSize) * Config.cellSize, randomInt(0, Config.height / Config.cellSize) * Config.cellSize);
+
+    getFreeCoords();
+}
 
 function play() {
     requestAnimationFrame(play);
@@ -128,12 +136,6 @@ function play() {
             restart();
         }
     });
-}
-
-function restart() {
-    snake = new Snake(0, 0);
-
-    food = new Food(randomInt(0, Config.width / Config.cellSize) * Config.cellSize, randomInt(0, Config.height / Config.cellSize) * Config.cellSize);
 }
 
 document.addEventListener("keydown", function(e) {
